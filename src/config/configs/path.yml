@@ -1,0 +1,4 @@
+prompt: prompt/prompts  #关键词路径
+knowledge: data/knowledge #知识文件路径
+md5_file: data/md5/md5.txt #md5存储文件路径
+vector_db: rag/vector_db #向量数据库文件夹路径

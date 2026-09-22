@@ -14,6 +14,10 @@ dependencies = [
     "ipython>=9.17.1",
     "ipykernel>=7.3.0",
     "faiss-cpu>=1.15.1",
+    "langgraph-cli[inmem]>=0.4.31",
+    "langchain-tavily>=0.2.18",
+    "fastapi>=0.141.1",
+    "booktype>=1.5",
 ]
 
 [[tool.uv.index]]

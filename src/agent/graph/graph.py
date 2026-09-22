@@ -10,7 +10,6 @@ llm对上方所整理好的(题目/答案/正确率/批判内容)总结整体为
 from langgraph.graph import StateGraph, START, END
 from agent.graph.nodes import *
 from agent.graph.state import OverAllState, InputState, OutputState
-from agent.graph.subgraphs.interview.interviewGraph import interviewGraph
 
 builder = StateGraph(state_schema=OverAllState, input_schema=InputState, output_schema=OutputState)
 
@@ -18,20 +17,22 @@ builder = StateGraph(state_schema=OverAllState, input_schema=InputState, output_
 builder.add_node("user_input_node", user_input_node)
 builder.add_node("agent_output_node", agent_output_node)
 builder.add_node("get_task", get_task)
-builder.add_node("output_node", output_node)
-builder.add_node("search_node", search_node)
 builder.add_node("get_problem_node", get_problem_node)
+builder.add_node("get_user_data_node", get_user_data_node)
+builder.add_node("review_node", review_node)
+
 
 # 子图节点
 builder.add_node("demand_graph_node", demand_graph_node)
-builder.add_node("interviewGraph", interviewGraph)
+builder.add_node("memory_node", memory_node)
 
 # 构建边
 builder.add_edge(START, "user_input_node")
-builder.add_conditional_edges("user_input_node", demand_router, ["demand_graph_node", "agent_output_node"])
+builder.add_conditional_edges("user_input_node", demand_router, ["agent_output_node","get_user_data_node"])
+builder.add_edge("get_user_data_node", "demand_graph_node")
 builder.add_edge("demand_graph_node", "get_problem_node")
 builder.add_edge("get_problem_node", "get_task")
-builder.add_conditional_edges("get_task", search_node,["interviewGraph"])
-builder.add_edge("interviewGraph", "get_task")
-builder.add_edge("output_node", "agent_output_node")
+builder.add_conditional_edges("get_task", search_node,["review_node","memory_node","get_task"])
+builder.add_edge("review_node", "get_task")
+builder.add_edge("memory_node", "agent_output_node")
 builder.add_edge("agent_output_node", END)

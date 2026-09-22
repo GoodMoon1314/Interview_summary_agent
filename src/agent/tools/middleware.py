@@ -33,11 +33,11 @@ def wrap_tool_call(request, execute):
     else:
         for i in range(max_attempts):
             try:
-                logger.info("开始调用工具")
+                logger.debug(f"开始调用工具:{tool_name}")
 
                 msg = execute(request)
 
-                logger.info("工具调用成功")
+                logger.debug("工具调用成功")
 
                 cache_list[cache] = msg.content
 

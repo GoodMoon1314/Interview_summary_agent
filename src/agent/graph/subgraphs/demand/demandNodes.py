@@ -2,7 +2,7 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from typing import Literal
 from agent.graph.structure import ProblemList
 from agent.graph.state import DemandOverALLState, DemandOutputState
-from agent.tools.agent_tools import search_rag
+from agent.tools.agent_tools import search_rag, web_sercher
 from factory.modelFactory import chat_model
 from prompt.prompt import problem_prompt, demand_structure_prompt
 from utils.loggerUtil import logger
@@ -15,27 +15,23 @@ from utils.loggerUtil import logger
     problem_list:面试题库
 """
 
-tools = [search_rag]
-
-
-# 去切换查询历史节点/直接查询rag节点
-def history_router(state: DemandOverALLState) -> Literal["get_rag_node"]:
-    is_history = state["is_history"]
-
-    if is_history:
-        pass
-
-    else:
-        return "get_rag_node"
+tools = [search_rag,web_sercher]
 
 
 def get_rag_node(state: DemandOverALLState) -> DemandOverALLState:
+    is_history = state["is_history"]
     problem_demand = state["problem_demand"]
     messages = state["messages"]
 
+    human = f"以下是用户面试需求{problem_demand}."
+
+    if is_history:
+        user_data = state.get("user_data")
+        human += f"以下是用户历史面试总结{user_data}"
+
     demand_agent = chat_model.bind_tools(tools=tools)
 
-    messages.append(HumanMessage(content=problem_demand))
+    messages.append(HumanMessage(content=human))
 
     problem = demand_agent.invoke(
         [SystemMessage(content=problem_prompt)] + messages
@@ -70,9 +66,9 @@ def demand_output_node(state: DemandOverALLState) -> DemandOutputState:
 
     result_message = []
 
-    for e in result.problem_list:
-        p = e.problem
-        a = e.answer
+    for e in result["problem_list"]:
+        p = e["problem"]
+        a = e["answer"]
         result_message.append({"problem": p, "answer": a})
 
     return {

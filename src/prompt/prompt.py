@@ -28,6 +28,8 @@ demand_prompt = get_config("demand_prompt")
 problem_prompt = get_config("problem_prompt")
 demand_structure_prompt = get_config("demand_structure_prompt")
 review_prompt = get_config("review_prompt")
+interview_summary_prompt = get_config("interview_summary")
+create_md_prompt = get_config("create_md")
 
 if __name__ == '__main__':
     print(demand_prompt)
